@@ -1,28 +1,272 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive MCQ Quiz</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Roboto:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        /* ...existing styles... */
+        #hacker-overlay {
+            opacity: 1;
+            transition: opacity 1s cubic-bezier(.4, 0, .2, 1);
+            pointer-events: auto;
+        }
+
+        #hacker-overlay.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+        }
+
+        h1,
+        h2 {
+            font-family: 'Montserrat', Arial, sans-serif;
+        }
+
+        .glow {
+            text-shadow: 0 2px 16px #7f9cf5, 0 1px 2px #000;
+        }
+
+        .option-checked {
+            background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);
+            color: #fff !important;
+            border: 2px solid #38b2ac;
+        }
+
+        .option-label {
+            transition: all 0.2s;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(20px) scale(0.98);
+            animation: fadeInUp 0.5s forwards;
+        }
+
+        .option-label:hover {
+            transform: scale(1.03) translateY(0);
+            box-shadow: 0 2px 8px rgba(67, 233, 123, 0.15);
+        }
+
+        .progress-bar {
+            transition: width 0.4s cubic-bezier(.4, 0, .2, 1);
+            box-shadow: 0 0 8px #38f9d7, 0 0 2px #764ba2;
+        }
+
+        /* Animated quiz background bubbles */
+        .quiz-bubble {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.18;
+            pointer-events: none;
+            animation: float-bubble 16s linear infinite;
+            background: radial-gradient(circle at 30% 30%, #fff 0%, #7f9cf5 100%);
+            z-index: 0;
+        }
+
+        .quiz-bubble2 {
+            background: radial-gradient(circle at 70% 70%, #fff 0%, #38f9d7 100%);
+            animation-duration: 22s;
+        }
+
+        .quiz-bubble3 {
+            background: radial-gradient(circle at 50% 50%, #fff 0%, #764ba2 100%);
+            animation-duration: 18s;
+        }
+
+        @keyframes float-bubble {
+            0% {
+                transform: translateY(100vh) scale(0.8);
+                opacity: 0.12;
+            }
+
+            30% {
+                opacity: 0.22;
+            }
+
+            100% {
+                transform: translateY(-20vh) scale(1.1);
+                opacity: 0.10;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes pop {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.15);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.7s;
+        }
+
+        .pop {
+            animation: pop 0.4s;
+        }
+
+        .btn-animated {
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .btn-animated:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 24px #38f9d7aa, 0 1px 2px #764ba2;
+        }
+
+        .btn-animated:active {
+            transform: scale(0.97);
+        }
+
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 18px;
+            border-radius: 3px;
+            opacity: 0.85;
+            will-change: transform;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl">
-        <h1 class="text-2xl font-bold mb-4 text-center">OOP and Java MCQ Quiz</h1>
-        <div id="quiz-container">
-            <div id="question" class="text-lg mb-4"></div>
-            <div id="options" class="space-y-2"></div>
-            <div id="feedback" class="mt-4 text-center font-semibold"></div>
-            <button id="submit-btn" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full">Submit Answer</button>
-            <button id="next-btn" class="mt-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 w-full hidden">Next Question</button>
-        </div>
-        <div id="result" class="mt-4 text-center hidden">
-            <h2 class="text-xl font-bold">Quiz Completed!</h2>
-            <p id="score"></p>
-            <button id="restart-btn" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Restart Quiz</button>
-        </div>
+
+<body class="flex items-center justify-center min-h-screen px-2 sm:px-4">
+
+
+
+    
+
+
+    <!-- Add this inside the .bg-white/90 ... main quiz card, just above the progress bar div -->
+    <div id="start-screen" class="flex flex-col items-center justify-center py-10 fade-in">
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-indigo-700 mb-4 glow">Welcome to the OOP &amp; Java MCQ
+            Quiz!</h2>
+        <button id="start-btn"
+            class="bg-gradient-to-r from-green-400 to-indigo-500 text-white px-6 py-3 rounded-xl shadow-lg hover:from-green-500 hover:to-indigo-600 transition-all font-bold text-lg tracking-wide btn-animated">Start
+            Quiz</button>
     </div>
 
+
+
+
+
+
+    <!-- Hacker Animation Overlay -->
+    <div id="hacker-overlay"
+        style="position:fixed;z-index:99999;inset:0;background:#000;display:flex;align-items:center;justify-content:center;">
+        <canvas id="matrix-canvas" style="width:100vw;height:100vh;display:block;"></canvas>
+        <div style="position:absolute;bottom:10%;width:100%;text-align:center;">
+            <span
+                style="color:#0f0;font-family:monospace;font-size:1.5rem;letter-spacing:2px;text-shadow:0 0 8px #0f0;">Initializing
+                Quiz...</span>
+        </div>
+    </div>
+    <script>
+        // Hide the hacker overlay after 1.5 seconds
+        window.addEventListener('DOMContentLoaded', function () {
+            setTimeout(function () {
+                const overlay = document.getElementById('hacker-overlay');
+                if (overlay) overlay.style.display = 'none';
+            }, 1500);
+        });
+    </script>
+
+    <!-- Animated background bubbles -->
+    <div class="quiz-bubble" style="width: 120px; height: 120px; left: 10vw; animation-delay: 0s;"></div>
+    <div class="quiz-bubble quiz-bubble2" style="width: 90px; height: 90px; left: 60vw; animation-delay: 4s;"></div>
+    <div class="quiz-bubble quiz-bubble3" style="width: 160px; height: 160px; left: 80vw; animation-delay: 8s;"></div>
+    <div class="quiz-bubble" style="width: 70px; height: 70px; left: 30vw; animation-delay: 2s;"></div>
+    <div class="quiz-bubble quiz-bubble2" style="width: 100px; height: 100px; left: 50vw; animation-delay: 10s;"></div>
+    <div class="quiz-bubble quiz-bubble3" style="width: 60px; height: 60px; left: 75vw; animation-delay: 14s;"></div>
+    <!-- End animated background -->
+
+    <div
+        class="bg-white/90 p-4 sm:p-6 md:p-8 rounded-2xl md:rounded-3xl shadow-2xl w-full max-w-full sm:max-w-md md:max-w-2xl border-2 md:border-4 border-indigo-200 relative overflow-hidden z-10">
+        <div
+            class="absolute -top-10 -left-10 w-28 h-28 sm:w-40 sm:h-40 bg-gradient-to-br from-indigo-400 to-purple-400 rounded-full opacity-30 blur-2xl pointer-events-none">
+        </div>
+        <div
+            class="absolute -bottom-10 -right-10 w-28 h-28 sm:w-40 sm:h-40 bg-gradient-to-tr from-green-300 to-blue-400 rounded-full opacity-30 blur-2xl pointer-events-none">
+        </div>
+        <h1
+            class="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-4 sm:mb-6 text-center text-indigo-700 glow tracking-tight fade-in">
+            OOP &amp; Java MCQ Quiz</h1>
+        <div class="mb-4 sm:mb-6">
+            <div class="w-full bg-gray-200 rounded-full h-2 sm:h-3">
+                <div id="progress-bar"
+                    class="progress-bar bg-gradient-to-r from-indigo-400 to-green-300 h-2 sm:h-3 rounded-full"
+                    style="width: 0%"></div>
+            </div>
+            <div class="text-right text-xs text-gray-500 mt-1" id="progress-text"></div>
+        </div>
+        <div id="quiz-container">
+            <div id="question"
+                class="text-base sm:text-lg md:text-xl font-semibold mb-4 sm:mb-5 text-indigo-800 fade-in"></div>
+            <div id="options" class="space-y-2 sm:space-y-3"></div>
+            <div id="feedback" class="mt-4 sm:mt-5 text-center font-bold text-base sm:text-lg"></div>
+            <button id="submit-btn"
+                class="mt-4 sm:mt-6 bg-gradient-to-r from-indigo-500 to-green-400 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl shadow-lg hover:from-indigo-600 hover:to-green-500 transition-all font-bold w-full text-base sm:text-lg tracking-wide btn-animated">Submit
+                Answer</button>
+            <button id="next-btn"
+                class="mt-2 sm:mt-3 bg-gradient-to-r from-green-400 to-indigo-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl shadow-lg hover:from-green-500 hover:to-indigo-600 transition-all font-bold w-full text-base sm:text-lg tracking-wide hidden btn-animated">Next
+                Question</button>
+        </div>
+        <div id="result" class="mt-6 sm:mt-8 text-center hidden fade-in">
+            <h2 class="text-xl sm:text-2xl font-extrabold text-green-600 mb-2 glow">Quiz Completed!</h2>
+            <p id="score" class="text-base sm:text-lg font-semibold mb-4"></p>
+            <button id="restart-btn"
+                class="bg-gradient-to-r from-indigo-500 to-green-400 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl shadow-lg hover:from-indigo-600 hover:to-green-500 transition-all font-bold text-base sm:text-lg tracking-wide btn-animated">Restart
+                Quiz</button>
+        </div>
+        <div class="absolute top-2 sm:top-4 right-2 sm:right-6 text-xs text-gray-400 font-mono opacity-60 select-none">
+            Powered by GitHub Copilot</div>
+    </div>
+    <canvas id="confetti" class="confetti" style="display:none"></canvas>
     <script>
         const questions = [
             {
@@ -359,21 +603,49 @@
         const resultContainer = document.getElementById('result');
         const scoreElement = document.getElementById('score');
         const restartBtn = document.getElementById('restart-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const confettiCanvas = document.getElementById('confetti');
+        window.addEventListener('DOMContentLoaded', function () {
+    setTimeout(function () {
+        const overlay = document.getElementById('hacker-overlay');
+        if (overlay) overlay.style.display = 'none';
+    }, 1500);
+});
+
+
+        function updateProgress() {
+            const percent = ((currentQuestion) / questions.length) * 100;
+            progressBar.style.width = percent + "%";
+            progressBar.classList.add('pop');
+            setTimeout(() => progressBar.classList.remove('pop'), 400);
+            progressText.textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+        }
 
         function loadQuestion() {
+            updateProgress();
             const q = questions[currentQuestion];
             questionElement.innerHTML = `${currentQuestion + 1}. ${q.question}`;
+            questionElement.classList.remove('fade-in');
+            void questionElement.offsetWidth; // trigger reflow
+            questionElement.classList.add('fade-in');
             optionsElement.innerHTML = '';
             q.options.forEach((option, index) => {
                 const label = document.createElement('label');
-                label.className = 'block p-2 bg-gray-100 rounded hover:bg-gray-200';
+                label.className = 'option-label block p-2 sm:p-3 bg-white border border-gray-200 rounded-lg sm:rounded-xl hover:bg-indigo-50 flex items-center gap-2 sm:gap-3 text-sm sm:text-base md:text-lg font-medium transition-all';
+                label.style.animationDelay = (index * 0.08 + 0.1) + "s";
                 label.innerHTML = `
-                    <input type="radio" name="answer" value="${index}" class="mr-2">
-                    ${option}
+                    <input type="radio" name="answer" value="${index}" class="mr-2 sm:mr-3 accent-indigo-500 scale-110 sm:scale-125">
+                    <span>${option}</span>
                 `;
+                label.querySelector('input').addEventListener('change', function () {
+                    document.querySelectorAll('.option-label').forEach(l => l.classList.remove('option-checked'));
+                    if (this.checked) label.classList.add('option-checked');
+                });
                 optionsElement.appendChild(label);
             });
             feedbackElement.textContent = '';
+            feedbackElement.className = 'mt-4 sm:mt-5 text-center font-bold text-base sm:text-lg';
             submitBtn.classList.remove('hidden');
             nextBtn.classList.add('hidden');
         }
@@ -382,21 +654,23 @@
             const selected = document.querySelector('input[name="answer"]:checked');
             if (!selected) {
                 feedbackElement.textContent = 'Please select an answer!';
-                feedbackElement.className = 'mt-4 text-center font-semibold text-red-500';
+                feedbackElement.className = 'mt-4 sm:mt-5 text-center font-bold text-base sm:text-lg text-red-500 animate-pulse fade-in';
                 return;
             }
             const answer = parseInt(selected.value);
             const correct = questions[currentQuestion].correct;
             if (answer === correct) {
-                feedbackElement.textContent = 'Correct!';
-                feedbackElement.className = 'mt-4 text-center font-semibold text-green-500';
+                feedbackElement.textContent = '🎉 Correct!';
+                feedbackElement.className = 'mt-4 sm:mt-5 text-center font-bold text-base sm:text-lg text-green-500 animate-bounce fade-in';
                 score++;
             } else {
-                feedbackElement.textContent = `Incorrect! The correct answer is: ${questions[currentQuestion].options[correct]}`;
-                feedbackElement.className = 'mt-4 text-center font-semibold text-red-500';
+                feedbackElement.innerHTML = `❌ Incorrect!<br><span class="text-indigo-700">Correct answer:</span> <span class="font-semibold text-green-600">${questions[currentQuestion].options[correct]}</span>`;
+                feedbackElement.className = 'mt-4 sm:mt-5 text-center font-bold text-base sm:text-lg text-red-500 fade-in';
             }
             submitBtn.classList.add('hidden');
             nextBtn.classList.remove('hidden');
+            // Disable all options
+            document.querySelectorAll('input[name="answer"]').forEach(input => input.disabled = true);
         }
 
         function nextQuestion() {
@@ -404,25 +678,164 @@
             if (currentQuestion < questions.length) {
                 loadQuestion();
             } else {
+                progressBar.style.width = "100%";
+                progressText.textContent = `Quiz Completed!`;
                 quizContainer.classList.add('hidden');
                 resultContainer.classList.remove('hidden');
-                scoreElement.textContent = `Your score: ${score} out of ${questions.length}`;
+                let remark = '';
+                if (score === questions.length) {
+                    remark = "🌟 Perfect Score! You're a Java Master!";
+                } else if (score > questions.length * 0.8) {
+                    remark = "👏 Great job! Almost perfect!";
+                } else if (score > questions.length * 0.5) {
+                    remark = "👍 Good effort! Keep practicing!";
+                } else {
+                    remark = "💡 Don't worry, try again and you'll improve!";
+                }
+                scoreElement.innerHTML = `<span class="text-indigo-700">${score}</span> out of <span class="text-indigo-700">${questions.length}</span><br><span class="text-base">${remark}</span>`;
+                launchConfetti();
             }
         }
+        document.getElementById('start-btn').addEventListener('click', function () {
+    // Hide start screen
+    startScreen.style.display = 'none';
+    // Restore quiz card to original size and style
+    quizCard.className = "bg-white/90 p-4 sm:p-6 md:p-8 rounded-2xl md:rounded-3xl shadow-2xl w-full max-w-full sm:max-w-md md:max-w-2xl border-2 md:border-4 border-indigo-200 relative overflow-hidden z-10";
+    quizCard.style.zIndex = "";
+    quizCard.style.position = "";
+    quizCard.style.inset = "";
+    // Show quiz form
+    quizContainer.classList.remove('hidden');
+    resultContainer.classList.add('hidden');
+    loadQuestion();
+});
+
 
         function restartQuiz() {
             currentQuestion = 0;
             score = 0;
             quizContainer.classList.remove('hidden');
             resultContainer.classList.add('hidden');
+            confettiCanvas.style.display = "none";
             loadQuestion();
         }
 
-        submitBtn.addEventListener('click', checkAnswer);
-        nextBtn.addEventListener('click', nextQuestion);
-        restartBtn.addEventListener('click', restartQuiz);
+        submitBtn.addEventListener('click', function () {
+            submitBtn.classList.add('pop');
+            setTimeout(() => submitBtn.classList.remove('pop'), 400);
+            checkAnswer();
+        });
+        nextBtn.addEventListener('click', function () {
+            nextBtn.classList.add('pop');
+            setTimeout(() => nextBtn.classList.remove('pop'), 400);
+            nextQuestion();
+        });
+        restartBtn.addEventListener('click', function () {
+            restartBtn.classList.add('pop');
+            setTimeout(() => restartBtn.classList.remove('pop'), 400);
+            restartQuiz();
+        });
 
-        loadQuestion();
+        if (!questions || !questions.length) {
+            alert('Questions array missing!');
+        } else {
+            loadQuestion();
+        }
+
+        // Confetti effect
+        function launchConfetti() {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+            confettiCanvas.style.display = "block";
+            const ctx = confettiCanvas.getContext('2d');
+            const colors = ['#43e97b', '#38f9d7', '#764ba2', '#667eea', '#f9ca24', '#e17055', '#00b894'];
+            let pieces = [];
+            for (let i = 0; i < 80; i++) {
+                pieces.push({
+                    x: Math.random() * confettiCanvas.width,
+                    y: Math.random() * -confettiCanvas.height,
+                    w: 10 + Math.random() * 6,
+                    h: 16 + Math.random() * 8,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    tilt: Math.random() * 10 - 5,
+                    tiltAngle: 0,
+                    tiltAngleIncrement: (Math.random() * 0.07) + 0.05,
+                    speed: 2 + Math.random() * 3
+                });
+            }
+            let frame = 0;
+            function drawConfetti() {
+                ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+                for (let p of pieces) {
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.tilt * Math.PI / 180);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                    ctx.restore();
+                    p.y += p.speed;
+                    p.tiltAngle += p.tiltAngleIncrement;
+                    p.tilt = Math.sin(p.tiltAngle) * 15;
+                    if (p.y > confettiCanvas.height + 20) {
+                        p.y = -20;
+                        p.x = Math.random() * confettiCanvas.width;
+                    }
+                }
+                frame++;
+                if (frame < 180) {
+                    requestAnimationFrame(drawConfetti);
+                } else {
+                    confettiCanvas.style.display = "none";
+                }
+            }
+            drawConfetti();
+        }
+
+        // Responsive confetti
+        window.addEventListener('resize', () => {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (
+                (e.key === 'Enter' || e.keyCode === 13) &&
+                document.activeElement.tagName !== 'TEXTAREA'
+            ) {
+                if (!submitBtn.classList.contains('hidden')) {
+                    submitBtn.click();
+                } else if (!nextBtn.classList.contains('hidden')) {
+                    nextBtn.click();
+                }
+            }
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (
+                (e.key === 'Enter' || e.keyCode === 13) &&
+                !submitBtn.classList.contains('hidden') &&
+                document.activeElement.tagName !== 'TEXTAREA'
+            ) {
+                submitBtn.click();
+            }
+
+
+        });
+
+        const startScreen = document.getElementById('start-screen');
+        const quizCard = document.querySelector('.bg-white/90');
+
+        document.getElementById('start-btn').addEventListener('click', function () {
+            // Hide start screen
+            startScreen.style.display = 'none';
+            // Make quiz card full page
+            quizCard.classList.remove('max-w-full', 'sm:max-w-md', 'md:max-w-2xl', 'p-4', 'sm:p-6', 'md:p-8');
+            quizCard.classList.add('fixed', 'inset-0', 'rounded-none', 'w-screen', 'h-screen', 'flex', 'flex-col', 'justify-center', 'items-center', 'p-0');
+            quizCard.style.zIndex = 100;
+        });
+
+
     </script>
 </body>
+
 </html>
