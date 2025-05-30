@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive MCQ Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl">
+        <h1 class="text-2xl font-bold mb-4 text-center">OOP and Java MCQ Quiz</h1>
+        <div id="quiz-container">
+            <div id="question" class="text-lg mb-4"></div>
+            <div id="options" class="space-y-2"></div>
+            <div id="feedback" class="mt-4 text-center font-semibold"></div>
+            <button id="submit-btn" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full">Submit Answer</button>
+            <button id="next-btn" class="mt-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 w-full hidden">Next Question</button>
+        </div>
+        <div id="result" class="mt-4 text-center hidden">
+            <h2 class="text-xl font-bold">Quiz Completed!</h2>
+            <p id="score"></p>
+            <button id="restart-btn" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Restart Quiz</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "What is a class in Object-Oriented Programming?",
+                options: [
+                    "A function that performs operations",
+                    "A factory that produces similar objects",
+                    "A variable that stores data",
+                    "A method that defines behavior"
+                ],
+                correct: 1
+            },
+            {
+                question: "What does an object represent in OOP?",
+                options: [
+                    "A blueprint for creating classes",
+                    "An instance of a class",
+                    "A variable that holds multiple values",
+                    "A function that manipulates data"
+                ],
+                correct: 1
+            },
+            {
+                question: "Which OOP feature is used to manage the complexity of a system by hiding complex processes?",
+                options: ["Encapsulation", "Inheritance", "Polymorphism", "Abstraction"],
+                correct: 3
+            },
+            {
+                question: "In the context of an ATM machine, what does encapsulation ensure?",
+                options: [
+                    "Users can access all background processes",
+                    "Data and functions are bound together and protected from unauthorized access",
+                    "Users can modify the ATM's internal code",
+                    "The ATM performs multiple functions with one name"
+                ],
+                correct: 1
+            },
+            {
+                question: "What does inheritance allow in OOP?",
+                options: [
+                    "Binding data and functions together",
+                    "Creating new classes that reuse properties of existing classes",
+                    "Using the same function name for multiple purposes",
+                    "Hiding complex processes from the user"
+                ],
+                correct: 1
+            },
+            {
+                question: "What does polymorphism mean in OOP?",
+                options: [
+                    "One name, many forms",
+                    "Binding data and functions",
+                    "Reusing parent class properties",
+                    "Hiding implementation details"
+                ],
+                correct: 0
+            },
+            {
+                question: "Which example best illustrates polymorphism?",
+                options: [
+                    "An ATM machine hiding its internal processes",
+                    "A mobile phone performing multiple functions with one interface",
+                    "A class of birds classified into flying and non-flying birds",
+                    "A user accessing only their own account data"
+                ],
+                correct: 1
+            },
+            {
+                question: "How do you start the BlueJ environment?",
+                options: [
+                    "Click Start > All apps > BlueJ > BlueJ or double-click the BlueJ icon",
+                    "Open a web browser and navigate to BlueJ’s website",
+                    "Run a Java program directly from the command line",
+                    "Install Java and run BlueJ from the terminal"
+                ],
+                correct: 0
+            },
+            {
+                question: "What is the first step to create a new program in BlueJ?",
+                options: [
+                    "Double-click the class icon",
+                    "Click on the Project menu and select New Project",
+                    "Write the program code directly",
+                    "Compile the existing code"
+                ],
+                correct: 1
+            },
+            {
+                question: "What happens when you double-click the Welcome class icon in BlueJ?",
+                options: [
+                    "The program compiles automatically",
+                    "The Program Code window appears",
+                    "The project is saved",
+                    "The output is displayed"
+                ],
+                correct: 1
+            },
+            {
+                question: "How do you compile a program in BlueJ?",
+                options: [
+                    "Right-click the class icon and select Compile",
+                    "Click the Compile button at the top-left corner",
+                    "Press Ctrl + C",
+                    "Select the Run option from the Project menu"
+                ],
+                correct: 1
+            },
+            {
+                question: "What indicates a successful compilation in BlueJ?",
+                options: [
+                    "A dialog box with the output",
+                    "The message 'Class compiled - no syntax errors' in the lower pane",
+                    "The BlueJ Terminal window opens",
+                    "The class icon changes color"
+                ],
+                correct: 1
+            },
+            {
+                question: "How do you execute a program in BlueJ?",
+                options: [
+                    "Click the Compile button",
+                    "Right-click the class icon and select void main (String[] args)",
+                    "Double-click the Project menu",
+                    "Press Ctrl + R"
+                ],
+                correct: 1
+            },
+            {
+                question: "What does the `public` keyword indicate in a Java method?",
+                options: [
+                    "The method cannot be accessed outside the class",
+                    "The method can be called from anywhere",
+                    "The method returns a value",
+                    "The method is temporary"
+                ],
+                correct: 1
+            },
+            {
+                question: "What is the purpose of the `void` keyword in a Java method?",
+                options: [
+                    "It indicates the method returns a string",
+                    "It signifies that the method does not return any value",
+                    "It makes the method private",
+                    "It allows multiple return types"
+                ],
+                correct: 1
+            },
+            {
+                question: "What is the role of `String args[]` in the main method?",
+                options: [
+                    "It stores the program’s output",
+                    "It represents command-line arguments passed to the program",
+                    "It defines the class name",
+                    "It specifies the return type"
+                ],
+                correct: 1
+            },
+            {
+                question: "What does the `System.out.println()` statement do?",
+                options: [
+                    "Reads input from the user",
+                    "Prints text or values to the terminal screen",
+                    "Compiles the program",
+                    "Defines a new class"
+                ],
+                correct: 1
+            },
+            {
+                question: "What is a comment in a Java program?",
+                options: [
+                    "Code that is executed by the compiler",
+                    "Text ignored by the computer, used for documentation",
+                    "A variable declaration",
+                    "A method definition"
+                ],
+                correct: 1
+            },
+            {
+                question: "What is a token in a Java program?",
+                options: [
+                    "A complete program",
+                    "The smallest element of a program, like a keyword or operator",
+                    "A class declaration",
+                    "A method call"
+                ],
+                correct: 1
+            },
+            {
+                question: "Which of the following is a valid rule for naming identifiers in Java?",
+                options: [
+                    "Identifiers can start with a digit",
+                    "Identifiers can be keywords",
+                    "Identifiers can start with a letter or underscore",
+                    "Identifiers must be exactly 5 characters long"
+                ],
+                correct: 2
+            },
+            {
+                question: "What is a keyword in Java?",
+                options: [
+                    "A user-defined variable name",
+                    "A reserved word with a special meaning",
+                    "A constant value",
+                    "An operator symbol"
+                ],
+                correct: 1
+            },
+            {
+                question: "Which of the following is an example of a numeric constant?",
+                options: ["'KIPS'", "'P'", "-22.5", '"Welcome"'],
+                correct: 2
+            },
+            {
+                question: "What is the size of the `int` data type in Java?",
+                options: ["1 byte", "2 to 4 bytes", "8 bytes", "16 bytes"],
+                correct: 1
+            },
+            {
+                question: "Which data type is used to store fractional values like 45.89?",
+                options: ["int", "char", "float or double", "boolean"],
+                correct: 2
+            },
+            {
+                question: "What is a character constant in Java?",
+                options: [
+                    "A sequence of characters in double quotes",
+                    "A single character in single quotes",
+                    "A numeric value",
+                    "A keyword"
+                ],
+                correct: 1
+            },
+            {
+                question: "What is the result of the expression `a + b` if `a = 12` and `b = 4`?",
+                options: ["8", "16", "48", "3"],
+                correct: 1
+            },
+            {
+                question: "Which operator is used to find the remainder of a division?",
+                options: ["/", "*", "%", "+"],
+                correct: 2
+            },
+            {
+                question: "What is the result of the relational expression `x == y` if `x = 24` and `y = 8`?",
+                options: ["True", "False", "24", "8"],
+                correct: 1
+            },
+            {
+                question: "What does the `++` operator do in Java?",
+                options: [
+                    "Decreases a variable’s value by 1",
+                    "Increases a variable’s value by 1",
+                    "Multiplies a variable by 2",
+                    "Divides a variable by 2"
+                ],
+                correct: 1
+            },
+            {
+                question: "What is the result of `a += 1` if `a = 8`?",
+                options: ["7", "8", "9", "32"],
+                correct: 2
+            },
+            {
+                question: "What is the output of the following program?<br><pre>public class Biodate {<br>    public static void main(String argal[]) {<br>        System.out.println(' Name is: Vishal ');<br>        System.out.println(' Class is: BA ');<br>        System.out.println(' Roll No is: 1 ');<br>    }<br>}</pre>",
+                options: [
+                    "Name is: Vishal, Class is: BA, Roll No is: 1",
+                    "Name is: BA, Class is: Vishal, Roll No is: 1",
+                    "Roll No is: 1, Class is: BA, Name is: Vishal",
+                    "No output"
+                ],
+                correct: 0
+            },
+            {
+                question: "In the simple interest program, what is the formula used to calculate simple interest?",
+                options: ["SI = P * R * T", "SI = (P * R * T) / 100", "SI = P + R + T", "SI = P / (R * T)"],
+                correct: 1
+            },
+            {
+                question: "What is the purpose of the program in the lab activity that accepts a customer’s bill?",
+                options: [
+                    "To calculate the bill without tax",
+                    "To add 5% service tax to the bill",
+                    "To subtract 5% from the bill",
+                    "To display the bill as is"
+                ],
+                correct: 1
+            },
+            {
+                question: "Who developed BlueJ?",
+                options: [
+                    "James Gosling",
+                    "Michael Kölling and John Rosenberg",
+                    "Oracle Corporation",
+                    "Sun Microsystems"
+                ],
+                correct: 1
+            },
+            {
+                question: "What is Java Bytecode?",
+                options: [
+                    "Machine-dependent code",
+                    "Platform-independent code generated by the Java compiler",
+                    "Source code written in Java",
+                    "A type of comment in Java"
+                ],
+                correct: 1
+            },
+            {
+                question: "Which of the following is a string constant?",
+                options: ["'P'", "12.5", '"Welcome to Java"', "45"],
+                correct: 2
+            },
+            {
+                question: "What happens if there are errors during compilation in BlueJ?",
+                options: [
+                    "The program executes anyway",
+                    "The errors must be fixed before recompiling",
+                    "The output is displayed with errors",
+                    "The program is saved automatically"
+                ],
+                correct: 1
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+
+        const questionElement = document.getElementById('question');
+        const optionsElement = document.getElementById('options');
+        const feedbackElement = document.getElementById('feedback');
+        const submitBtn = document.getElementById('submit-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const quizContainer = document.getElementById('quiz-container');
+        const resultContainer = document.getElementById('result');
+        const scoreElement = document.getElementById('score');
+        const restartBtn = document.getElementById('restart-btn');
+
+        function loadQuestion() {
+            const q = questions[currentQuestion];
+            questionElement.innerHTML = `${currentQuestion + 1}. ${q.question}`;
+            optionsElement.innerHTML = '';
+            q.options.forEach((option, index) => {
+                const label = document.createElement('label');
+                label.className = 'block p-2 bg-gray-100 rounded hover:bg-gray-200';
+                label.innerHTML = `
+                    <input type="radio" name="answer" value="${index}" class="mr-2">
+                    ${option}
+                `;
+                optionsElement.appendChild(label);
+            });
+            feedbackElement.textContent = '';
+            submitBtn.classList.remove('hidden');
+            nextBtn.classList.add('hidden');
+        }
+
+        function checkAnswer() {
+            const selected = document.querySelector('input[name="answer"]:checked');
+            if (!selected) {
+                feedbackElement.textContent = 'Please select an answer!';
+                feedbackElement.className = 'mt-4 text-center font-semibold text-red-500';
+                return;
+            }
+            const answer = parseInt(selected.value);
+            const correct = questions[currentQuestion].correct;
+            if (answer === correct) {
+                feedbackElement.textContent = 'Correct!';
+                feedbackElement.className = 'mt-4 text-center font-semibold text-green-500';
+                score++;
+            } else {
+                feedbackElement.textContent = `Incorrect! The correct answer is: ${questions[currentQuestion].options[correct]}`;
+                feedbackElement.className = 'mt-4 text-center font-semibold text-red-500';
+            }
+            submitBtn.classList.add('hidden');
+            nextBtn.classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                quizContainer.classList.add('hidden');
+                resultContainer.classList.remove('hidden');
+                scoreElement.textContent = `Your score: ${score} out of ${questions.length}`;
+            }
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            quizContainer.classList.remove('hidden');
+            resultContainer.classList.add('hidden');
+            loadQuestion();
+        }
+
+        submitBtn.addEventListener('click', checkAnswer);
+        nextBtn.addEventListener('click', nextQuestion);
+        restartBtn.addEventListener('click', restartQuiz);
+
+        loadQuestion();
+    </script>
+</body>
+</html>
